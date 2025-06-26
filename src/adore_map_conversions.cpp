@@ -290,6 +290,7 @@ to_cpp_type( const adore_ros2_msgs::msg::Route& msg )
   route.start.y       = msg.start.y;
   route.destination.x = msg.goal.x;
   route.destination.y = msg.goal.y;
+  route.map           = std::make_shared<Map>( to_cpp_type( msg.map ) );
 
 
   return route;
@@ -300,6 +301,8 @@ adore_ros2_msgs::msg::Route
 to_ros_msg( const Route& route )
 {
   adore_ros2_msgs::msg::Route msg;
+
+  msg.map = to_ros_msg( *route.map );
 
   // Convert lane IDs
   for( const auto& section : route.sections )

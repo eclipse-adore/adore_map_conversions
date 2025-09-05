@@ -1,16 +1,16 @@
 /********************************************************************************
- * Copyright (c) 2025 Contributors to the Eclipse Foundation
- *
- * See the NOTICE file(s) distributed with this work for additional
- * information regarding copyright ownership.
+ * Copyright (C) 2024-2025 German Aerospace Center (DLR).
+ * Eclipse ADORe, Automated Driving Open Research https://eclipse.org/adore
  *
  * This program and the accompanying materials are made available under the
  * terms of the Eclipse Public License 2.0 which is available at
- * https://www.eclipse.org/legal/epl-2.0
+ * http://www.eclipse.org/legal/epl-2.0.
  *
  * SPDX-License-Identifier: EPL-2.0
+ *
+ * Contributors:
+ *    Marko Mizdrak
  ********************************************************************************/
-
 #include "adore_map_conversions.hpp"
 
 namespace adore
@@ -267,28 +267,30 @@ to_cpp_type( const adore_ros2_msgs::msg::Route& msg )
 
   for( const auto& point_msg : msg.center_points )
   {
+    // Convert from ROS to internal MapPoint
     auto mp = to_cpp_type( point_msg );
 
+    // Find which RouteSection this point belongs to, via lane_id
     auto it = route.lane_to_sections.find( mp.parent_id );
     if( it == route.lane_to_sections.end() )
     {
+      // std::cerr << "section not found when converting  " << mp.parent_id << std::endl;
       continue;
     }
-
-    auto   section_ptr         = it->second;
+    auto   section_ptr         = it->second; // shared_ptr<RouteSection>
     bool   forward             = ( section_ptr->end_s >= section_ptr->start_s );
     double local_s             = forward ? ( mp.s - section_ptr->start_s ) : ( section_ptr->start_s - mp.s );
     double route_s             = section_ptr->route_s + local_s;
     route.center_lane[route_s] = mp;
   }
 
+
+  // Convert start and destination points
   route.start.x       = msg.start.x;
   route.start.y       = msg.start.y;
   route.destination.x = msg.goal.x;
   route.destination.y = msg.goal.y;
 
-  // Ensure spline is built after center lane is populated
-  route.initialize_spline();
 
   return route;
 }

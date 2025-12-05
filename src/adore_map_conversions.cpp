@@ -262,7 +262,6 @@ to_cpp_type( const adore_ros2_msgs::msg::Route& msg )
     std::shared_ptr<RouteSection> section_ptr = std::make_shared<RouteSection>( cpp_section );
     route.sections.push_back( section_ptr );
     route.lane_to_sections[section.lane_id] = section_ptr;
-    route.s_to_sections[section.route_s]    = section_ptr;
   }
 
   for( const auto& point_msg : msg.center_points )
@@ -277,11 +276,11 @@ to_cpp_type( const adore_ros2_msgs::msg::Route& msg )
       // std::cerr << "section not found when converting  " << mp.parent_id << std::endl;
       continue;
     }
-    auto   section_ptr         = it->second; // shared_ptr<RouteSection>
-    bool   forward             = ( section_ptr->end_s >= section_ptr->start_s );
-    double local_s             = forward ? ( mp.s - section_ptr->start_s ) : ( section_ptr->start_s - mp.s );
-    double route_s             = section_ptr->route_s + local_s;
-    route.center_lane[route_s] = mp;
+    auto   section_ptr            = it->second; // shared_ptr<RouteSection>
+    bool   forward                = ( section_ptr->end_s >= section_ptr->start_s );
+    double local_s                = forward ? ( mp.s - section_ptr->start_s ) : ( section_ptr->start_s - mp.s );
+    double route_s                = section_ptr->route_s + local_s;
+    route.reference_line[route_s] = mp;
   }
 
 
@@ -302,7 +301,10 @@ to_ros_msg( const Route& route )
 {
   adore_ros2_msgs::msg::Route msg;
 
-  msg.map = to_ros_msg( *route.map );
+  if( route.map )
+  {
+    msg.map = to_ros_msg( *route.map );
+  }
 
   // Convert lane IDs
   for( const auto& section : route.sections )
@@ -312,7 +314,7 @@ to_ros_msg( const Route& route )
   }
 
   // Convert center points
-  for( const auto& [s, map_point] : route.center_lane )
+  for( const auto& [s, map_point] : route.reference_line )
   {
     msg.center_points.push_back( to_ros_msg( map_point ) );
   }

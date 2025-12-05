@@ -211,7 +211,7 @@ expect_route_equal( const adore_ros2_msgs::msg::Route& a, const adore_ros2_msgs:
     expect_route_section_equal( a.sections[i], b.sections[i] );
   }
 
-  // center_points – may be reordered by center_lane map
+  // center_points – may be reordered by reference_line map
   expect_route_center_points_equal_unordered( a.center_points, b.center_points );
 
   // start / goal

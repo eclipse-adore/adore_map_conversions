@@ -8,7 +8,6 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Dependencies
 find_package(ament_cmake REQUIRED)
-find_package(caches REQUIRED PATHS ${CMAKE_INSTALL_PREFIX}/../caches/lib/cmake/caches)
 find_package(adore_map REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(adore_ros2_msgs REQUIRED)
